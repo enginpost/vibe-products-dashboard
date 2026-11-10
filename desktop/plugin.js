@@ -78,29 +78,31 @@ function VibePane({ ctx }) {
       }),
       jsx('div', {
         className: 'flex-1 overflow-auto p-3 space-y-3',
-        children: visible.map(p => jsxs('div', {
-          className: 'rounded border border-(--ui-stroke-secondary) p-3 bg-(--ui-bg-secondary)',
-          children: [
-            jsxs('div', { className: 'flex items-start justify-between', children: [
-              jsxs('div', { className: 'font-medium text-sm flex items-center gap-2', children: [
-                jsx('span', { children: '📁' }),
-                p.name
-              ]}),
-              jsx('div', { className: 'text-xs text-(--ui-text-tertiary)', children: `Status: ${p.status || '—'}` })
-            ]}),
-            jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-1', children: `Started: ${p.start || '—'} • End: ${p.end || '—'}` }),
-            jsx('div', { className: 'mt-2 space-y-1', children: [
-              metric('Product Vision Management Readiness (%)', p.vision),
-              metric('Product Iterations Ready for Execution (%)', p.iter_ready),
-              metric('Product Iterations Executing (%)', p.iter_exec),
-            ]}),
-            jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-2', children: `Last log: ${p.log || '—'}` }),
-            jsxs('div', { className: 'flex gap-2 mt-2', children: [
-              jsx(Button, { onClick: () => openLog(p), children: 'All Logs' }),
-              jsx(Button, { onClick: () => toggleHide(p.name), children: hidden.includes(p.name) ? 'Show' : 'Hide' })
-            ]})
-          ]
-        }, p.name))
+        children: visible.length === 0
+          ? jsx('div', { className: 'text-sm text-(--ui-text-tertiary)', children: '(there are no active products to show)' })
+          : visible.map(p => jsxs('div', {
+              className: 'rounded border border-(--ui-stroke-secondary) p-3 bg-(--ui-bg-secondary)',
+              children: [
+                jsxs('div', { className: 'flex items-start justify-between', children: [
+                  jsxs('div', { className: 'font-medium text-sm flex items-center gap-2', children: [
+                    jsx('span', { children: '📁' }),
+                    p.name
+                  ]}),
+                  jsx('div', { className: 'text-xs text-(--ui-text-tertiary)', children: `Status: ${p.status || '—'}` })
+                ]}),
+                jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-1', children: `Started: ${p.start || '—'} • End: ${p.end || '—'}` }),
+                jsx('div', { className: 'mt-2 space-y-1', children: [
+                  metric('Product Vision Management Readiness (%)', p.vision),
+                  metric('Product Iterations Ready for Execution (%)', p.iter_ready),
+                  metric('Product Iterations Executing (%)', p.iter_exec),
+                ]}),
+                jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-2', children: `Last log: ${p.log || '—'}` }),
+                jsxs('div', { className: 'flex gap-2 mt-2', children: [
+                  jsx(Button, { onClick: () => openLog(p), children: 'All Logs' }),
+                  jsx(Button, { onClick: () => toggleHide(p.name), children: hidden.includes(p.name) ? 'Show' : 'Hide' })
+                ]})
+              ]
+            }, p.name))
       })
     ]
   })
