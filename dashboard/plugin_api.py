@@ -6,9 +6,10 @@ from typing import Dict, List
 
 router = APIRouter()
 
+PLUGIN_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PLUGIN_DIR = os.path.dirname(os.path.abspath(__file__))
-CONFIG_PATH = os.path.join(PLUGIN_DIR, 'config.json')
-HIDDEN_PATH = os.path.join(PLUGIN_DIR, 'hidden.json')
+CONFIG_PATH = os.path.join(PLUGIN_ROOT, 'config.json')
+HIDDEN_PATH = os.path.join(PLUGIN_ROOT, 'hidden.json')
 
 DEFAULT_BASE = r'C:\Users\mchoy\OneDrive\_projects\_Gen_AI\OpenCode\Vibe Products\Source\Data\Vibe Products'
 
