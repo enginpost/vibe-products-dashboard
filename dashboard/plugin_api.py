@@ -131,6 +131,7 @@ async def get_projects():
                 'status': meta.get('Status', ''),
                 'start': meta.get('Start Date', ''),
                 'end': meta.get('End Date', ''),
+                'openCodeProject': meta.get('OpenCode Project', ''),
                 'vision': sdlc.get('vision', 0),
                 'iter_exec': sdlc.get('iter_exec', 0),
                 'iter_ready': sdlc.get('iter_ready', 0),
