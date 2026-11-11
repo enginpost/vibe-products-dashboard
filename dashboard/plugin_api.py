@@ -172,3 +172,26 @@ async def open_log(body: dict):
     if proj_path and os.path.exists(proj_path):
         return {'ok': True, 'path': proj_path}
     return {'ok': False}
+
+@router.post('/read-file')
+async def read_file(body: dict):
+    name = body.get('name')
+    if not name:
+        return {'ok': False, 'content': ''}
+    base = load_config()
+    proj_path = None
+    for entry in os.listdir(base):
+        proj_dir = os.path.join(base, entry)
+        if os.path.isdir(proj_dir):
+            meta = parse_meta(os.path.join(proj_dir, 'PROJECT_META.md'))
+            if meta.get('Name', entry) == name or entry == name:
+                proj_path = os.path.join(proj_dir, 'log.md')
+                break
+    if proj_path and os.path.exists(proj_path):
+        try:
+            with open(proj_path, 'r', encoding='utf-8', errors='ignore') as f:
+                content = f.read()
+            return {'ok': True, 'content': content, 'path': proj_path}
+        except Exception as e:
+            return {'ok': False, 'content': '', 'error': str(e)}
+    return {'ok': False, 'content': ''}
