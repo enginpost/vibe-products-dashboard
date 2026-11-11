@@ -54,20 +54,22 @@ def parse_meta(path):
     meta = {}
     try:
         with open(path, 'r', encoding='utf-8', errors='ignore') as f:
-            txt = f.read()
-        # Support both bold **Key:** Value and plain Key: Value with - or • bullet
-        # Value is optional -> .* to allow empty values
-        patterns = [
-            r'[-•]\s*\*\*(.+?):\*\*\s*(.*)',
-            r'[-•]\s*(.+?):\s*(.*)',
-        ]
-        for pat in patterns:
-            for m in re.finditer(pat, txt):
-                key = m.group(1).strip()
-                val = m.group(2).strip()
-                if key.lower() in ('name','status','start date','end date','opencode project','dashboard','priority','repo path'):
-                    # Only set if we haven't already got a non-empty value, or allow empty to override
-                    if key not in meta or meta[key] != '':
+            for line in f:
+                line = line.strip()
+                # Remove leading bullet
+                if line.startswith('•'):
+                    line = line[1:].lstrip()
+                elif line.startswith('-'):
+                    line = line[1:].lstrip()
+                # Try bold **Key:** Value
+                m = re.match(r'\*\*(.+?):\*\*\s*(.*)', line)
+                if not m:
+                    # Try plain Key: Value
+                    m = re.match(r'(.+?):\s*(.*)', line)
+                if m:
+                    key = m.group(1).strip()
+                    val = m.group(2).strip()
+                    if key.lower() in ('name','status','start date','end date','opencode project','dashboard','priority','repo path'):
                         meta[key] = val
     except Exception:
         pass
