@@ -139,7 +139,6 @@ async def set_config(body: dict):
 @router.get('/projects')
 async def get_projects():
     base = load_config()
-    hidden = load_hidden()
     projects = []
     if os.path.isdir(base):
         for name in os.listdir(base):
@@ -165,20 +164,53 @@ async def get_projects():
             })
     # sort by name
     projects.sort(key=lambda p: p['name'].lower())
-    return {'projects': projects, 'hidden': list(hidden)}
+    return {'projects': projects, 'hidden': []}
 
 @router.post('/hide')
 async def toggle_hide(body: dict):
     project = body.get('project')
     if not project:
         return {'ok': False}
-    hidden = load_hidden()
-    if project in hidden:
-        hidden.discard(project)
-    else:
-        hidden.add(project)
-    save_hidden(hidden)
-    return {'ok': True, 'hidden': list(hidden)}
+    base = load_config()
+    # find project dir by name
+    proj_dir = None
+    for entry in os.listdir(base):
+        pdir = os.path.join(base, entry)
+        if not os.path.isdir(pdir):
+            continue
+        meta = parse_meta(os.path.join(pdir, 'PROJECT_META.md'))
+        if meta.get('Name', entry) == project or entry == project:
+            proj_dir = pdir
+            break
+    if not proj_dir:
+        return {'ok': False}
+    meta_path = os.path.join(proj_dir, 'PROJECT_META.md')
+    try:
+        with open(meta_path, 'r', encoding='utf-8', errors='ignore') as f:
+            lines = f.readlines()
+        # Determine current Dashboard value
+        current = ''
+        for i, line in enumerate(lines):
+            # match line with Dashboard:
+            m = re.search(r'(?i)^\s*[-•\*\s]*\s*(?:\*\*)?Dashboard\s*:\s*\*\*?\s*(.*)', line)
+            if m:
+                current = m.group(1).strip().lower()
+                # toggle
+                new_val = 'hidden' if current == 'render' else 'render'
+                # preserve original prefix
+                # replace value part in line
+                # simple replace Dashboard: <old> with Dashboard: <new>
+                new_line = re.sub(r'(?i)(Dashboard\s*:\s*)\S*', r'\1' + new_val, line)
+                lines[i] = new_line
+                break
+        # if no Dashboard line found, append one
+        else:
+            lines.append(f'- Dashboard: hidden\n')
+        with open(meta_path, 'w', encoding='utf-8') as f:
+            f.writelines(lines)
+        return {'ok': True}
+    except Exception as e:
+        return {'ok': False, 'error': str(e)}
 
 @router.post('/open-log')
 async def open_log(body: dict):
