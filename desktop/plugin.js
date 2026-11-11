@@ -88,7 +88,10 @@ function VibePane({ ctx }) {
         className: 'flex items-center justify-between px-3 py-2 border-b border-(--ui-stroke-secondary)',
         children: [
           jsx('div', { className: 'text-sm font-medium', children: 'Vibe Products' }),
-          jsx(Button, { onClick: load, children: 'Refresh' })
+          jsxs('div', { className: 'flex gap-2', children: [
+            jsx('button', { type: 'button', onClick: () => host.notify({kind:'info',message:'Test button works'}), className: 'px-2 py-1 rounded bg-(--ui-accent) text-white text-xs', children: 'Test' }),
+            jsx(Button, { onClick: load, children: 'Refresh' })
+          ]})
         ]
       }),
       jsx('div', {
