@@ -113,7 +113,7 @@ function VibePane({ ctx }) {
                 ]}),
                 jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-2', children: `Last log: ${p.log || '—'}` }),
                 jsxs('div', { className: 'flex gap-2 mt-2', children: [
-                  jsx('button', { onClick: () => { host.notify({kind:'info',message:'All Logs clicked'}); openLog(p) }, className: 'px-2 py-1 rounded bg-(--ui-accent) text-white text-xs', children: 'All Logs' }),
+                  jsx('button', { type: 'button', onClick: () => host.notify({kind:'info',message:`All Logs clicked for ${p.name}`}), className: 'px-2 py-1 rounded bg-(--ui-accent) text-white text-xs', children: 'All Logs' }),
                   jsx(Button, { onClick: () => toggleHide(p.name), children: hidden.includes(p.name) ? 'Show' : 'Hide' })
                 ]})
               ]
