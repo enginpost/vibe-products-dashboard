@@ -52,27 +52,28 @@ function VibePane({ ctx }) {
 
   const openLog = async (p) => {
     try {
+      host.notify({ kind: 'info', message: `Opening log for ${p.name}...` })
       const res = await ctx.rest('/read-file', { method: 'POST', body: { name: p.name } })
-      if (res?.ok && res.content) {
-        host.newChat()
-        // Use 'new' address for the fresh draft and wait a tick for the composer to mount
-        const wait = (ms) => new Promise(r => setTimeout(r, ms))
-        await wait(350)
-        const text = `Log for ${p.name}:\n\n${res.content}`
-        const ok = await host.composer.setDraft('new', text)
-        if (ok) {
-          host.composer.focus('new')
-          host.notify({ kind: 'info', message: `Log for ${p.name} loaded into new chat` })
-        } else {
-          // fallback to active composer
-          const ok2 = await host.composer.setDraft(null, text)
-          if (ok2) host.notify({ kind: 'info', message: `Log for ${p.name} loaded` })
-          else host.notifyError('Could not open composer for log')
-        }
-      } else {
+      if (!res?.ok || !res.content) {
         host.notifyError('Could not read log file')
+        return
       }
-    } catch {
+      host.newChat()
+      const wait = (ms) => new Promise(r => setTimeout(r, ms))
+      await wait(600)
+      const text = `Log for ${p.name}:\n\n${res.content}`
+      // Try 'new' first, then fallback to active composer
+      let ok = await host.composer.setDraft('new', text)
+      if (!ok) {
+        ok = await host.composer.setDraft(null, text)
+      }
+      if (ok) {
+        host.composer.focus(null)
+        host.notify({ kind: 'info', message: `Log for ${p.name} loaded into new chat (${res.content.length} chars)` })
+      } else {
+        host.notifyError('Composer not ready – log not loaded')
+      }
+    } catch (e) {
       host.notifyError('Failed to open log')
     }
   }
