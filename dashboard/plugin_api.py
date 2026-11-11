@@ -56,21 +56,32 @@ def parse_meta(path):
         with open(path, 'r', encoding='utf-8', errors='ignore') as f:
             for line in f:
                 line = line.strip()
+                if not line:
+                    continue
                 # Remove leading bullet
                 if line.startswith('•'):
                     line = line[1:].lstrip()
                 elif line.startswith('-'):
                     line = line[1:].lstrip()
-                # Try bold **Key:** Value
-                m = re.match(r'\*\*(.+?):\*\*\s*(.*)', line)
-                if not m:
-                    # Try plain Key: Value
-                    m = re.match(r'(.+?):\s*(.*)', line)
-                if m:
-                    key = m.group(1).strip()
-                    val = m.group(2).strip()
-                    if key.lower() in ('name','status','start date','end date','opencode project','dashboard','priority','repo path'):
-                        meta[key] = val
+                # Remove leading ** if present
+                if line.startswith('**'):
+                    # **Key:** Value
+                    if ':**' in line:
+                        key_part, val_part = line.split(':**', 1)
+                        key = key_part[2:].strip()
+                        val = val_part.strip()
+                    else:
+                        continue
+                else:
+                    # Plain Key: Value
+                    if ':' in line:
+                        key, val = line.split(':', 1)
+                        key = key.strip()
+                        val = val.strip()
+                    else:
+                        continue
+                if key.lower() in ('name','status','start date','end date','opencode project','dashboard','priority','repo path'):
+                    meta[key] = val
     except Exception:
         pass
     return meta
