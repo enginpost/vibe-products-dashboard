@@ -113,7 +113,11 @@ function VibePane({ ctx }) {
                   ]}),
                   jsx('div', { className: 'text-xs text-(--ui-text-tertiary)', children: `Status: ${p.status || '—'}` })
                 ]}),
-                jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-1', children: `Started: ${p.start || '—'} • Ended: ${p.end ? p.end : '(ongoing)'}` }),
+                jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-1', children: (() => {
+                  const endVal = (p.end || '').trim()
+                  const isEmpty = !endVal || /priority|repo path|opencode project/i.test(endVal)
+                  return `Started: ${p.start || '—'} • Ended: ${isEmpty ? '(ongoing)' : endVal}`
+                })() }),
                 p.openCodeProject ? jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-1', children: `OpenCode Project: ${p.openCodeProject}` }) : null,
                 jsx('div', { className: 'mt-2 space-y-1', children: [
                   metric('Product Vision Management Readiness (%)', p.vision),
