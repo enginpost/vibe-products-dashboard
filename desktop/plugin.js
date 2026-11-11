@@ -54,10 +54,17 @@ function VibePane({ ctx }) {
     try {
       const res = await ctx.rest('/read-file', { method: 'POST', body: { name: p.name } })
       if (res?.ok && res.content) {
-        const preview = res.content.slice(0, 800) + (res.content.length > 800 ? '\n…truncated' : '')
-        host.notify({ kind: 'info', message: `${p.name} log loaded (${res.content.length} chars). See console for preview.` })
-        // Also show a quick toast with first lines
-        console.log('LOG CONTENT:', preview)
+        // Open a fresh chat and preload the log content into the composer
+        host.newChat()
+        // Give the new chat a moment to mount, then set draft
+        setTimeout(() => {
+          // Insert log content into the active composer
+          host.composer.setDraft(null, `Log for ${p.name}:\n\n${res.content}`)
+            .then(ok => {
+              if (ok) host.notify({ kind: 'info', message: `Log for ${p.name} loaded into new chat` })
+              else host.notify({ kind: 'warn', message: `Opened new chat for ${p.name} log` })
+            })
+        }, 300)
       } else {
         host.notifyError('Could not read log file')
       }
