@@ -2,27 +2,36 @@
 
 Self-contained Hermes Desktop plugin that renders your Vibe Projects dashboard natively.
 
-## Install via Git in Hermes Desktop
+## Install
 
-Hermes Desktop can install desktop plugins from a git repo.
+### Windows / local Hermes Desktop
+1. Open Hermes Desktop → Settings → Plugins → Install from Git
+2. Paste the repo URL:
+   ```
+   https://github.com/enginpost/vibe-products-dashboard.git
+   ```
+3. The plugin will be installed to `%LOCALAPPDATA%\hermes\desktop-plugins\vibe-products-dashboard\`
+4. Reload desktop plugins in Hermes Desktop.
 
-1. Create a new GitHub repo, e.g. `vibe-products-dashboard`
-2. Push this repo:
+### Remote Hermes Agent
+If you are running a remote Hermes Agent (e.g., Ubuntu gateway), install the plugin on the agent host via SSH:
+
 ```bash
-git remote add origin https://github.com/<your-user>/vibe-products-dashboard.git
-git branch -M main
-git push -u origin main
+ssh user@your-hermes-host
+HERMES_HOME=/mnt/data/hermes hermes plugins install https://github.com/enginpost/vibe-products-dashboard.git
+HERMES_HOME=/mnt/data/hermes hermes plugins enable vibe-products-dashboard
+HERMES_HOME=/mnt/data/hermes hermes gateway restart -y
 ```
-3. In Hermes Desktop: Settings → Plugins → Install from Git → paste the repo URL
-   - The plugin id is `vibe-products-dashboard` and must match the folder name.
+
+The desktop UI is installed on your Windows machine, and the backend `dashboard/plugin_api.py` runs on the remote agent where the Vibe Products data lives.
 
 ## Structure
 ```
 vibe-products-dashboard/
-  plugin.js        # Desktop UI, pane + settings page
-  plugin_api.py    # Backend API: /config /projects /hide /open-log
-  config.json      # Base path for Vibe Projects data
-  hidden.json      # Persisted hidden projects
+  desktop/plugin.js        # Desktop UI, pane + settings page
+  dashboard/plugin_api.py  # Backend API: /config /projects /hide /open-log
+  config.json              # Base path for Vibe Projects data
+  plugin.yaml              # Plugin manifest
 ```
 
 ## Configuration

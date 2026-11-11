@@ -1,1 +1,8 @@
-{"name": "vibe-products-dashboard", "api": "plugin_api.py"}
+{
+  "name": "vibe-products-dashboard",
+  "label": "Vibe Products Dashboard",
+  "version": "0.1.0",
+  "tab": { "path": "/vibe-products-dashboard", "position": "end", "hidden": true },
+  "entry": "dist/index.js",
+  "api": "plugin_api.py"
+}
