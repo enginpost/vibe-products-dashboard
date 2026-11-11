@@ -55,17 +55,25 @@ function VibePane({ ctx }) {
       host.notify({ kind: 'info', message: `Opening log for ${p.name}...` })
       const res = await ctx.rest('/read-file', { method: 'POST', body: { name: p.name } })
       if (!res?.ok || !res.content) {
-        host.notifyError('Could not read log file')
+        host.notifyError(`Could not read log file: ${res?.ok ? 'empty' : 'backend error'}`)
         return
       }
       host.newChat()
       const wait = (ms) => new Promise(r => setTimeout(r, ms))
       await wait(600)
       const text = `Log for ${p.name}:\n\n${res.content}`
-      // Try 'new' first, then fallback to active composer
-      let ok = await host.composer.setDraft('new', text)
+      let ok = false
+      try {
+        ok = await host.composer.setDraft('new', text)
+      } catch (e) {
+        host.notifyError(`setDraft('new') error: ${e}`)
+      }
       if (!ok) {
-        ok = await host.composer.setDraft(null, text)
+        try {
+          ok = await host.composer.setDraft(null, text)
+        } catch (e) {
+          host.notifyError(`setDraft(null) error: ${e}`)
+        }
       }
       if (ok) {
         host.composer.focus(null)
@@ -74,7 +82,7 @@ function VibePane({ ctx }) {
         host.notifyError('Composer not ready – log not loaded')
       }
     } catch (e) {
-      host.notifyError('Failed to open log')
+      host.notifyError(`Failed to open log: ${e?.message || e}`)
     }
   }
 
