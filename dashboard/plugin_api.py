@@ -56,16 +56,19 @@ def parse_meta(path):
         with open(path, 'r', encoding='utf-8', errors='ignore') as f:
             txt = f.read()
         # Support both bold **Key:** Value and plain Key: Value with - or • bullet
+        # Value is optional -> .* to allow empty values
         patterns = [
-            r'[-•]\s*\*\*(.+?):\*\*\s*(.+)',
-            r'[-•]\s*(.+?):\s*(.+)',
+            r'[-•]\s*\*\*(.+?):\*\*\s*(.*)',
+            r'[-•]\s*(.+?):\s*(.*)',
         ]
         for pat in patterns:
             for m in re.finditer(pat, txt):
                 key = m.group(1).strip()
-                # Avoid capturing the value of a previous key as key
+                val = m.group(2).strip()
                 if key.lower() in ('name','status','start date','end date','opencode project','dashboard','priority','repo path'):
-                    meta[key] = m.group(2).strip()
+                    # Only set if we haven't already got a non-empty value, or allow empty to override
+                    if key not in meta or meta[key] != '':
+                        meta[key] = val
     except Exception:
         pass
     return meta
