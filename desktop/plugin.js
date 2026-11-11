@@ -1,6 +1,6 @@
 import { jsx, jsxs } from 'react/jsx-runtime'
 import { useEffect, useState, useMemo } from 'react'
-import { Button, Input, Dialog, useValue, host } from '@hermes/plugin-sdk'
+import { Button, Input, useValue, host } from '@hermes/plugin-sdk'
 
 const DEFAULT_BASE = 'C:\\Users\\mchoy\\OneDrive\\_projects\\_Gen_AI\\OpenCode\\Vibe Products\\Source\\Data\\Vibe Products'
 const STORAGE_KEY = 'basePath'
@@ -50,13 +50,14 @@ function VibePane({ ctx }) {
     } catch {}
   }
 
-  const [logDialog, setLogDialog] = useState({ open: false, name: '', content: '' })
-
   const openLog = async (p) => {
     try {
       const res = await ctx.rest('/read-file', { method: 'POST', body: { name: p.name } })
       if (res?.ok && res.content) {
-        setLogDialog({ open: true, name: p.name, content: res.content })
+        const preview = res.content.slice(0, 800) + (res.content.length > 800 ? '\n…truncated' : '')
+        host.notify({ kind: 'info', message: `${p.name} log loaded (${res.content.length} chars). See console for preview.` })
+        // Also show a quick toast with first lines
+        console.log('LOG CONTENT:', preview)
       } else {
         host.notifyError('Could not read log file')
       }
@@ -105,17 +106,6 @@ function VibePane({ ctx }) {
                 ]})
               ]
             }, p.name))
-      }),
-      jsx(Dialog, {
-        open: logDialog.open,
-        onOpenChange: (o) => setLogDialog(d => ({...d, open: o})),
-        children: jsxs('div', {
-          className: 'p-4 max-w-2xl',
-          children: [
-            jsx('div', { className: 'text-sm font-medium mb-2', children: logDialog.name + ' – log.md' }),
-            jsx('pre', { className: 'whitespace-pre-wrap text-xs bg-(--ui-bg-tertiary) p-3 rounded overflow-auto max-h-96', children: logDialog.content || 'No content' })
-          ]
-        })
       })
     ]
   })
