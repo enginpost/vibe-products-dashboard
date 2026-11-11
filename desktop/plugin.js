@@ -96,10 +96,7 @@ function VibePane({ ctx }) {
         className: 'flex items-center justify-between px-3 py-2 border-b border-(--ui-stroke-secondary)',
         children: [
           jsx('div', { className: 'text-sm font-medium', children: 'Vibe Products' }),
-          jsxs('div', { className: 'flex gap-2', children: [
-            jsx('button', { type: 'button', onClick: () => host.notify({kind:'info',message:'Test button works'}), className: 'px-2 py-1 rounded bg-(--ui-accent) text-white text-xs', children: 'Test' }),
-            jsx(Button, { onClick: load, children: 'Refresh' })
-          ]})
+          jsx(Button, { onClick: load, children: 'Refresh' })
         ]
       }),
       jsx('div', {
@@ -123,8 +120,7 @@ function VibePane({ ctx }) {
                   metric('Product Iterations Executing (%)', p.iter_exec),
                 ]}),
                 jsx('div', { className: 'text-xs text-(--ui-text-tertiary) mt-2', children: `Last log: ${p.log || '—'}` }),
-                jsxs('div', { className: 'flex gap-2 mt-2', children: [
-                  jsx('button', { type: 'button', onClick: () => openLog(p), className: 'px-2 py-1 rounded bg-(--ui-accent) text-white text-xs', children: 'All Logs' }),
+                jsx('div', { className: 'flex gap-2 mt-2', children: [
                   jsx(Button, { onClick: () => toggleHide(p.name), children: hidden.includes(p.name) ? 'Show' : 'Hide' })
                 ]})
               ]
